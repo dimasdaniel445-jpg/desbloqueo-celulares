@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Desbloqueo de Celulares Online | Rápido y Seguro</title>
+  <meta name="description" content="Servicio profesional de desbloqueo de celulares online. Liberamos iPhone y Android por IMEI de forma rápida y segura." />
+  <style>
+    body { margin:0; font-family:Arial, Helvetica, sans-serif; background:#f5f7fa; color:#333; }
+    header { background:linear-gradient(135deg,#0f2027,#203a43,#2c5364); color:#fff; padding:60px 20px; text-align:center; }
+    header h1 { font-size:2.5rem; margin-bottom:10px; }
+    header p { font-size:1.1rem; max-width:700px; margin:0 auto 30px; }
+    .btn { display:inline-block; padding:15px 30px; background:#00c853; color:#fff; text-decoration:none; border-radius:6px; font-weight:bold; }
+    section { padding:60px 20px; max-width:1100px; margin:auto; }
+    h2 { color:#203a43; }
+    .services { display:grid; grid-template-columns:repeat(auto-fit,minmax(250px,1fr)); gap:20px; }
+    .card { background:#fff; padding:30px; border-radius:10px; box-shadow:0 4px 10px rgba(0,0,0,0.08); }
+    .card h3 { margin-top:0; color:#2c5364; }
+    .form-container { background:#fff; padding:40px; border-radius:10px; box-shadow:0 4px 10px rgba(0,0,0,0.08); max-width:600px; margin:auto; }
+    label { font-weight:bold; font-size:0.9rem; }
+    form input, form select, form textarea { width:100%; padding:12px; margin-bottom:15px; border-radius:5px; border:1px solid #ccc; font-size:1rem; }
+    form button { width:100%; padding:14px; background:#2c5364; color:#fff; border:none; border-radius:6px; font-size:1rem; cursor:pointer; }
+    #infoPago { display:none; margin-top:15px; background:#eef6f0; padding:15px; border-radius:6px; font-size:0.95rem; }
+    footer { background:#203a43; color:#fff; text-align:center; padding:30px 20px; font-size:0.9rem; }
+  </style>
+</head>
+<body>
+
+<header>
+  <h1>Desbloqueo de Celulares Online</h1>
+  <p>Desbloqueamos tu celular por IMEI de forma rápida, segura y 100% online. Compatible con iPhone y Android.</p>
+  <a href="#formulario" class="btn">Solicitar Desbloqueo</a>
+</header>
+
+<section>
+  <h2>¿Por qué elegirnos?</h2>
+  <div class="services">
+    <div class="card"><h3>100% Online</h3><p>Todo el proceso se realiza de forma remota mediante IMEI.</p></div>
+    <div class="card"><h3>Seguro y Legal</h3><p>Métodos oficiales y seguros, sin riesgos para tu dispositivo.</p></div>
+    <div class="card"><h3>Rápido</h3><p>Desbloqueos en minutos u horas, según modelo y operador.</p></div>
+  </div>
+</section>
+
+<section id="formulario">
+  <h2>Solicita tu desbloqueo</h2>
+  <div class="form-container">
+    <form id="formDesbloqueo">
+      <label>Comprobante de pago Zelle</label>
+      <input type="file" id="comprobante" accept="image/*,application/pdf" required />
+
+      <label>Nombre completo</label>
+      <input type="text" id="nombre" required />
+
+      <label>Correo electrónico</label>
+      <input type="email" id="correo" required />
+
+      <label>Marca del celular</label>
+      <input type="text" id="marca" required />
+
+      <label>Modelo</label>
+      <input type="text" id="modelo" required />
+
+      <label>IMEI (15 dígitos)</label>
+      <input type="text" id="imei" pattern="[0-9]{15}" required />
+
+      <label>Operador</label>
+      <select id="operador" required>
+        <option value="">Selecciona el operador</option>
+        <option>AT&T</option><option>T-Mobile</option><option>Verizon</option>
+        <option>Movistar</option><option>Telcel</option><option>Claro</option><option>Otro</option>
+      </select>
+
+      <label>Mensaje adicional</label>
+      <textarea id="mensaje" rows="4"></textarea>
+
+      <button type="submit">Pagar con Zelle</button>
+      <div id="infoPago"></div>
+    </form>
+  </div>
+</section>
+
+<footer>
+  <p>© 2026 Desbloqueo de Celulares Online. Todos los derechos reservados.</p>
+</footer>
+
+<script>
+// PRECIOS POR PAÍS Y OPERADOR
+const preciosPorPais = {
+  'United States': { 'AT&T':220, 'T-Mobile':210, 'Verizon':240, 'Desconocido':220 },
+  'Mexico': { 'Telcel':180, 'Movistar':160, 'AT&T':170, 'Desconocido':170 },
+  'Colombia': { 'Claro':160, 'Movistar':150, 'Desconocido':150 },
+  'Default': { 'Desconocido':200 }
+};
+
+function calcularPrecio(pais, operador, marca) {
+  const preciosPais = preciosPorPais[pais] || preciosPorPais['Default'];
+  let precio = preciosPais[operador] || preciosPais['Desconocido'];
+  if (marca === 'Apple') precio += 20;
+  return precio;
+}
+
+// FUNCIONES PRINCIPALES
+async function detectarPorIMEI(imei) {
+  const response = await fetch('api/imei.php?imei=' + imei);
+  if (!response.ok) return { error: true };
+  return await response.json();
+}
+
+async function guardarOrden(data, precio) {
+  const formData = new FormData();
+  formData.append('nombre', document.getElementById('nombre').value);
+  formData.append('correo', document.getElementById('correo').value);
+  formData.append('marca', data.marca);
+  formData.append('modelo', data.modelo);
+  formData.append('imei', document.getElementById('imei').value);
+  formData.append('operador', data.operador);
+  formData.append('pais', data.pais);
+  formData.append('precio', precio);
+
+  await fetch('api/guardar_orden.php', { method:'POST', body: formData });
+}
+
+function enviarWhatsApp(resumen) {
+  const numeroWhatsApp = '15551234567';
+  const texto = encodeURIComponent('📱 Nueva solicitud de desbloqueo%0A%0A' + resumen);
+  window.open(`https://wa.me/${numeroWhatsApp}?text=${texto}`, '_blank');
+}
+
+// EVENTO BLUR IMEI
+document.getElementById('imei').addEventListener('blur', async function() {
+  const imei = this.value;
+  if (imei.length !== 15) return;
+
+  const infoPago = document.getElementById('infoPago');
+  infoPago.style.display = 'block';
+  infoPago.innerHTML = 'Verificando IMEI...';
+
+  const data = await detectarPorIMEI(imei);
+
+  if (data.error || data.bloqueado) {
+    infoPago.innerHTML = '<strong style="color:red">Este equipo está reportado o no es elegible.</strong>';
+    document.querySelector('button[type="submit"]').disabled = true;
+    return;
+  }
+
+  document.querySelector('button[type="submit"]').disabled = false;
+  document.getElementById('marca').value = data.marca;
+  document.getElementById('modelo').value = data.modelo;
+  document.getElementById('operador').value = data.operador;
+
+  const precio = calcularPrecio(data.pais, data.operador, data.marca);
+  infoPago.innerHTML = `<strong>Equipo elegible</strong><br>
+    Marca: <strong>${data.marca}</strong><br>
+    Modelo: <strong>${data.modelo}</strong><br>
+    Operador: <strong>${data.operador}</strong><br>
+    País: <strong>${data.pais}</strong><br>
+    Precio desbloqueo: <strong>$${precio} USD</strong>`;
+});
+
+// ENVÍO DE FORMULARIO
+document.getElementById('formDesbloqueo').addEventListener('submit', async function(e) {
+  e.preventDefault();
+  const imei = document.getElementById('imei').value;
+  const comprobante = document.getElementById('comprobante').files.length;
+  if (!comprobante) { alert('Por favor sube tu comprobante de pago.'); return; }
+
+  const data = await detectarPorIMEI(imei);
+  const precio = calcularPrecio(data.pais, data.operador, data.marca);
+
+  await guardarOrden(data, precio);
+
+  const resumen = `Nombre: ${document.getElementById('nombre').value}%0AIMEI: ${imei}%0AMarca: ${data.marca}%0AModelo: ${data.modelo}%0AOperador: ${data.operador}%0APaís: ${data.pais}%0APrecio: $${precio} USD`;
+  enviarWhatsApp(resumen);
+
+  document.getElementById('infoPago').innerHTML = `<strong>Solicitud enviada correctamente.</strong>`;
+});
+</script>
+
+</body>
+</html>
